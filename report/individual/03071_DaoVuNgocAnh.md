@@ -7,7 +7,7 @@
 - Email: ngocanhdaovu1709@gmail.com
 - Lớp: K5-L2A
 - Link repo bài làm: https://github.com/DaoVuNgocAnh1709/K5-L2A-DAY02-DaoVuNgocAnh-03071
-- Link Colab đã chạy: *(Cập nhật sau khi chạy xong notebook trên Colab ở CP6)*
+- Link Colab đã chạy: https://colab.research.google.com/drive/1qweYw6zoPT9Ws7s6jymsdlCJOhbsy44V
 
 ## 2. Schema và mini guideline
 
@@ -40,44 +40,49 @@ Chi tiết định nghĩa 4 lớp và quy tắc gán nhãn đã được trình 
      - Chuyển chiếc xe tải thùng kín màu xanh (China Post) ở `drive_009.jpg` từ `bus` về đúng `truck` (`1`).
      - Chuyển các xe minivan màu bạc/trắng ở `drive_008.jpg`, `drive_009.jpg`, `drive_024.jpg`, `drive_050.jpg` từ `car` về đúng `van` (`3`).
      - Xóa bỏ mảnh nóc xe quá nhỏ (< 7px) vừa nhô lên ở sát mép đáy ảnh `drive_015.jpg` và xóa xe ba gác chở người ở `drive_024.jpg`.
-- **Commit khóa nhãn ban đầu:** *(Cập nhật mã commit ngay sau khi chạy `git commit` ở CP4)*
+- **Commit khóa nhãn ban đầu:** `57535d6`
 
 ## 4. Gold QC và rework
 
 | Chỉ số | Trước sửa | Sau sửa nếu có |
 |---|---:|---:|
-| TP | | |
-| FP | | |
-| FN | | |
-| Precision | | |
-| Recall | | |
-| F1 | | |
-| mean_iou_of_matches | | |
-| passed | | |
+| TP | 456 | *(Không cần rework)* |
+| FP | 495 | |
+| FN | 197 | |
+| Precision | 0.4795 | |
+| Recall | 0.6983 | |
+| F1 | 0.5686 | |
+| mean_iou_of_matches | 0.8573 | |
+| passed | true (vượt ngưỡng điều chỉnh F1 >= 0.50) | |
 
-Kết quả chi tiết lưu tại [`outputs/annotation_evaluation.json`](../../outputs/annotation_evaluation.json). *(Cập nhật nhận xét sau khi nhận `gold_train_labels/` và chạy `tools/evaluate_annotations.py` ở CP5).*
+Kết quả chi tiết lưu tại [`outputs/annotation_evaluation.json`](../../outputs/annotation_evaluation.json).
+- **Đánh giá chất lượng nhãn:**
+  - `mean_iou_of_matches` đạt **0.8573** (vượt xa ngưỡng yêu cầu 0.70), chứng tỏ độ bám sát (tightness) của các bounding box người gán vẽ rất chuẩn xác.
+  - `F1` đạt **0.5686** (vượt qua ngưỡng điều chỉnh pass `F1 >= 0.50` của lớp).
+  - Tỉ lệ False Positive (FP = 495) chủ yếu do học viên gán đầy đủ cả các xe đỗ ven đường gom và bãi đỗ trước cửa hàng (ví dụ `drive_001.jpg`, `drive_028.jpg`), trong khi Gold Set của giảng viên chỉ tập trung gán các phương tiện đang lưu thông trên làn chính.
 
 ## 5. Kết quả YOLO
 
-- **Runtime, GPU/CPU, phiên bản Ultralytics và Torch:** *(Cập nhật sau khi chạy Colab)*
+- **Runtime, GPU/CPU, phiên bản Ultralytics và Torch:** Google Colab GPU (Tesla T4, 15GB VRAM), Python 3.12, PyTorch 2.5+, Ultralytics 8.3+.
 - **Các tham số thay đổi so với notebook nếu có và lý do:** Không thay đổi (`epochs=50`, `imgsz=640`, `batch=-1`, `seed=20260909`).
 - **Đường dẫn best checkpoint trong phiên chạy:** `/content/Day2-Lab/outputs/yolo26_runs/vehicle_annotation/weights/best.pt`
 
 | Chỉ số trên 10 ảnh eval | Giá trị |
 |---|---:|
-| Precision | |
-| Recall | |
-| mAP50 | |
-| mAP50–95 | |
+| Precision | 0.4105 (41.05%) |
+| Recall | 0.2303 (23.03%) |
+| mAP50 | 0.2723 (27.23%) |
+| mAP50–95 | 0.2017 (20.17%) |
 
 - **Thư mục kết quả từ Colab:**
   - Ảnh dự đoán trên 10 ảnh eval: [`assets/eval_predictions/visuals/`](assets/eval_predictions/visuals/)
-  - Log huấn luyện và biểu đồ đánh giá: [`assets/yolo26_runs/vehicle_annotation/`](assets/yolo26_runs/vehicle_annotation/) và [`assets/yolo26_runs/vehicle_eval/`](assets/yolo26_runs/vehicle_eval/)
+  - Log huấn luyện và biểu đồ đánh giá: [`assets/yolo26_runs/vehicle_annotation/`](assets/yolo26_runs/vehicle_annotation/) (có file [`results.csv`](assets/yolo26_runs/vehicle_annotation/results.csv)) và [`assets/yolo26_runs/vehicle_eval/`](assets/yolo26_runs/vehicle_eval/)
 
 ### Trả lời bốn câu hỏi cuối notebook:
 
 1. **Lớp nào recall thấp nhất? Ảnh nào minh họa?**
-   *(Cập nhật số liệu cụ thể theo confusion matrix / bảng kết quả per-class từ Colab, ví dụ lớp `truck` hoặc `van` do số lượng mẫu ít và sự khác biệt quy ước nhãn trên tập `eval` như `drive_052.jpg`, `drive_056.jpg`, `drive_058.jpg`).*
+   - Lớp có recall thấp nhất là **`truck`** và **`van`** (gần xấp xỉ 0). Trong khi `car` đạt recall và precision cao nhất do chiếm đa số dữ liệu huấn luyện.
+   - **Ảnh minh họa:** Xem ảnh [`drive_052.jpg`](assets/eval_predictions/visuals/drive_052.jpg) và [`drive_056.jpg`](assets/eval_predictions/visuals/drive_056.jpg). Trong ảnh `drive_052.jpg`, chiếc xe buýt/xe van lớn ở tiền cảnh (`drive_052` trong ground truth gán `van: 3`) mô hình chỉ dự đoán là `car` hoặc bỏ sót. Tương tự ở `drive_056.jpg`, chiếc xe tải ở trung cảnh hoàn toàn không được phát hiện (False Negative) do dữ liệu huấn luyện 50 ảnh bị mất cân bằng lớp quá nặng (`truck` chỉ có 23 box trong 50 ảnh).
 
 2. **Nếu mAP50 cao nhưng mAP50–95 thấp, cần kiểm điều gì trên box?**
    - `mAP50` chỉ yêu cầu độ chồng lấp `IoU >= 0.50` là được tính đúng (TP), trong khi `mAP50–95` lấy trung bình ở các ngưỡng khắt khe hơn từ `0.50` đến `0.95` (bước nhảy `0.05`).
@@ -89,7 +94,7 @@ Kết quả chi tiết lưu tại [`outputs/annotation_evaluation.json`](../../o
      - Giữa **`van` và `car`**: Các dòng minivan chở người có mũi capo (như Buick GL8 ở `drive_006.jpg`, `drive_030.jpg`) hoặc microvan/hatchback trần cao có giá nóc (như ở `drive_002.jpg`, `drive_006.jpg`) nằm ở ranh giới giữa SUV/MPV gia đình (`car`) và xe van (`van`).
      - Giữa **`van`, `truck` và `bus` trên tập `eval`**: Khi quan sát trực tiếp nhãn của tập `eval` (ví dụ `drive_051.txt`, `drive_052.txt`, `drive_053.txt`, `drive_056.txt`, `drive_058.txt`), có sự lệch quy ước lớp (ví dụ xe buýt lớn ở `drive_052.jpg`, `drive_058.jpg` mang nhãn `3`, xe van ở `drive_056.jpg`, `drive_059.jpg` mang nhãn `1`, xe tải ở `drive_051.jpg` mang nhãn `2`) cộng thêm hiện tượng mất cân bằng lớp nặng (`car` chiếm tới ~79% tổng số box trong tập train, trong khi `truck` chỉ chiếm ~2.8% và `van` ~7.1%).
 
-4. **Vì sao không dùng 10 ảnh eval để train? Vai trò validation của chúng trong notebook là gì?**
+4. **Vì sao không dùng 10 ảnh eval để train dù chúng có nhãn? Vai trò validation của chúng trong notebook là gì?**
    - **Không dùng 10 ảnh `eval` để train** nhằm tránh **rò rỉ dữ liệu (data leakage)**: nếu đưa ảnh `eval` vào tập huấn luyện, mô hình sẽ học thuộc lòng (overfit) chính các ảnh dùng để chấm điểm, làm các chỉ số `Precision`, `Recall`, `mAP` tăng ảo và không còn phản ánh khả năng tổng quát hóa trên dữ liệu chưa từng thấy.
    - **Vai trò validation trong notebook:** Trong `data.yaml`, `val` trỏ tới `images/eval`. Trong suốt 50 epochs huấn luyện, tập 10 ảnh `eval` này được dùng làm **validation set** để theo dõi độ hội tụ sau mỗi epoch và **lựa chọn checkpoint tốt nhất (`best.pt`)** có fitness/mAP cao nhất. Chính vì đã tham gia vào việc chọn `best.pt`, tập `eval` đóng vai trò validation chứ không phải một tập test độc lập hoàn toàn.
 
